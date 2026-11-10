@@ -1,0 +1,28 @@
+<title>Folio</title>
+<meta name="theme-color" content="#fafcf2">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Folio">
+  
+  <link rel="icon" href="assets/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+<div id="phone">
+    <main id="app" aria-live="polite">
+      <div class="splash"><span class="spinner" aria-label="Loading"></span></div>
+    </main>
+    <div id="sheet-root"></div>
+    <div id="busy" hidden><div class="busy-card"><span class="spinner"></span><span id="busy-text">Working…</span></div></div>
+    <div id="toast" role="status" aria-live="polite"></div>
+  </div>
+
+  <!-- Hidden pickers: camera, photo library, files, avatar, backup -->
+  <input type="file" id="in-camera" accept="image/*" capture="environment" hidden>
+  <input type="file" id="in-photos" accept="image/*" multiple hidden>
+  <input type="file" id="in-files" accept="image/*,.jpg,.jpeg,.png,.webp,.heic" multiple hidden>
+  <input type="file" id="in-avatar" accept="image/*" hidden>
+  <input type="file" id="in-backup" accept="application/json,.json" hidden>
+
+  <script src="app.js"></script>

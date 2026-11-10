@@ -1,0 +1,16 @@
+{
+  "name": "folio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Folio — turn your handwritten world into a digital home",
+  "scripts": {
+    "ios": "sh setup-ios.sh"
+  },
+  "dependencies": {
+    "@capacitor/core": "7.0.1",
+    "@capacitor/ios": "7.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "7.0.1"
+  }
+}

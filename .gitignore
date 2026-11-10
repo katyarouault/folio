@@ -1,0 +1,17 @@
+# Dependencies and build output
+node_modules/
+www/
+
+# Capacitor / Xcode build files
+ios/App/build/
+ios/App/Pods/
+ios/DerivedData/
+*.xcuserstate
+xcuserdata/
+
+# Mac
+.DS_Store
+
+# Never commit secrets
+.env
+.env.*
