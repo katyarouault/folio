@@ -22,5 +22,19 @@ setkey NSCameraUsageDescription "Folio uses your camera to scan handwritten page
 setkey NSPhotoLibraryUsageDescription "Folio lets you pick photos of your notes to add to your library."
 setkey NSPhotoLibraryAddUsageDescription "Folio saves pages you export to your photo library."
 
+# Google Sign-In needs the reversed iOS client ID as a URL scheme.
+GID=$(sed -n "s/.*googleIOSClientId: '\([^']*\)'.*/\1/p" app.js | head -1)
+if [ -n "$GID" ]; then
+  SCHEME="com.googleusercontent.apps.${GID%.apps.googleusercontent.com}"
+  /usr/libexec/PlistBuddy -c "Delete :CFBundleURLTypes" "$PL" 2>/dev/null || true
+  /usr/libexec/PlistBuddy -c "Add :CFBundleURLTypes array" \
+    -c "Add :CFBundleURLTypes:0 dict" \
+    -c "Add :CFBundleURLTypes:0:CFBundleURLSchemes array" \
+    -c "Add :CFBundleURLTypes:0:CFBundleURLSchemes:0 string $SCHEME" "$PL"
+  echo "     Added Google URL scheme $SCHEME"
+else
+  echo "     (Google iOS client ID not set in app.js yet — Google sign-in will be skipped)"
+fi
+
 echo "4/4  Opening Xcode"
 npx cap open ios

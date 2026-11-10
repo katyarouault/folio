@@ -596,3 +596,12 @@ input[type="date"].input::-webkit-calendar-picker-indicator { opacity: .6; curso
 
 .contact-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .contact-email { flex: 1; min-width: 0; font-weight: 600; overflow-wrap: anywhere; user-select: text; -webkit-user-select: text; }
+
+/* Sign in with Apple / Google */
+.social { margin-bottom: 8px; }
+.btn-apple { background: #000; color: #fff; }
+.btn-google { background: #fff; color: #1f1f1f; border: 1px solid #747775; }
+.btn-apple svg, .btn-google svg { flex: none; }
+.or-row { display: flex; align-items: center; gap: 12px; color: var(--ink-2, currentColor); opacity: .75; font-size: .9375rem; margin-top: 4px; }
+.or-row::before, .or-row::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.social-error:empty { display: none; }

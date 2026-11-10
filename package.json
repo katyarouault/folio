@@ -7,10 +7,11 @@
     "ios": "sh setup-ios.sh"
   },
   "dependencies": {
-    "@capacitor/core": "7.0.1",
-    "@capacitor/ios": "7.0.1"
+    "@capacitor/core": "7.6.9",
+    "@capacitor/ios": "7.6.9",
+    "@capgo/capacitor-social-login": "7.20.0"
   },
   "devDependencies": {
-    "@capacitor/cli": "7.0.1"
+    "@capacitor/cli": "7.6.9"
   }
 }

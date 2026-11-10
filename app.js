@@ -152,11 +152,15 @@ const SB = {
   url: 'https://ukpaibohfmydaygtvwmc.supabase.co',
   key: 'sb_publishable_tYQauIOO5i3jBaks3dTj1g_3R68NuoD',
   bucket: 'folio-images',
+  // Google Cloud Console -> Credentials -> OAuth client IDs (fill in once created).
+  googleIOSClientId: '',
+  googleWebClientId: '',
   on: false, client: null, uid: null,
 };
+const isNative = () => !!window.Capacitor?.isNativePlatform?.();
 try {
   if (window.supabase?.createClient && !window.claude?.use) {
-    SB.client = window.supabase.createClient(SB.url, SB.key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false } });
+    SB.client = window.supabase.createClient(SB.url, SB.key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: !isNative() } });
     SB.on = true;
   }
 } catch (e) { console.warn('Supabase unavailable', e); }
@@ -792,6 +796,7 @@ screens.welcome = () => `<div class="screen welcome"><div class="scroll pad">
 /* ---------- Create account ---------- */
 screens.signup = () => `<div class="screen">${topbar({})}<div class="scroll pad">
   <h1 class="t-h2 center mb-24">Create account</h1>
+  ${socialButtons()}
   <form class="stack gap-16" novalidate data-submit="signup">
     <div class="signup-avatar"><button type="button" class="avatar" data-act="signup-avatar" aria-label="Add a profile photo">${S.signupAvatar ? `<img src="${S.signupAvatar}" alt="">` : icon('user')}<span class="avatar-edit">${icon(S.signupAvatar ? 'camera' : 'plus')}</span></button>
       <span class="t-small muted">${S.signupAvatar ? 'Tap to change photo' : 'Add a profile photo (optional)'}</span></div>
@@ -809,6 +814,7 @@ screens.signup = () => `<div class="screen">${topbar({})}<div class="scroll pad"
 /* ---------- Log in ---------- */
 screens.login = () => `<div class="screen">${topbar({})}<div class="scroll pad">
   <h1 class="t-h2 center mb-24">Log in</h1>
+  ${socialButtons()}
   <form class="stack gap-16" novalidate data-submit="login">
     ${SB.on ? field('Email', 'id', 'email', 'you@example.com', 'email') : field('Username / email', 'id', 'text', 'you@example.com', 'username')}
     ${field('Password', 'password', 'password', 'Your password', 'current-password')}
@@ -1500,7 +1506,7 @@ A.use = (el) => {
   $('#uses-next').textContent = S.usesSel.size ? 'Continue' : 'Skip for now';
 };
 A['uses-next'] = () => {
-  S.data.uses = [...S.usesSel]; S.data.tags = tagsFromUses(S.data.uses); saveData();
+  S.data.uses = [...S.usesSel]; S.data.tags = tagsFromUses(S.data.uses); S.data.onboarded = true; saveData();
   go('allset', {}, { reset: true });
 };
 A['get-started'] = () => go('home', {}, { reset: true });
@@ -2031,9 +2037,12 @@ const sbOk = ({ data, error }) => { if (error) throw error; return data; };
 async function sbEnter(authUser, keep) {
   SB.uid = authUser.id;
   const email = String(authUser.email || '').toLowerCase();
-  S.users = { [email]: { name: authUser.user_metadata?.name || email.split('@')[0], email } };
+  const md = authUser.user_metadata || {};
+  S.users = { [email]: { name: md.name || md.full_name || md.given_name || email.split('@')[0], email } };
   await startSession(email, keep);
 }
+/* A person who has never been through onboarding (new Google/Apple sign-in). */
+const needsOnboarding = () => !S.data.onboarded && !S.data.notes.length && !(S.data.uses || []).length;
 async function sbInit() {
   try {
     const { data } = await withTimeout(SB.client.auth.getSession(), 8000);
@@ -2041,7 +2050,8 @@ async function sbInit() {
     const sess = await local.get('kv', 'session');
     if (u && (sess?.keep !== false || ssGet('folio-active'))) {
       await sbEnter(u, sess?.keep !== false);
-      S.route = { name: 'home', params: {} };
+      S.usesSel = new Set();
+      S.route = { name: needsOnboarding() ? 'uses' : 'home', params: {} };
       sbRetryPending();
       return;
     }
@@ -2197,6 +2207,87 @@ if (SB.on) {
     SB.uid = null; S.session = null; S.data = null; busy(false); applyTheme(); go('welcome', {}, { reset: true });
     toast('Your account has been deleted');
   };
+}
+
+
+/* ---------- Sign in with Apple / Google (App Store build) ----------
+   In the iPhone app, the native Apple and Google sheets hand back an ID
+   token that Supabase verifies. In a browser, Supabase's own sign-in page
+   is used and redirects back here. */
+const APPLE_LOGO = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M16.37 1.43c0 1.14-.42 2.2-1.25 3.05-.9.93-1.97 1.47-3.13 1.38-.02-.11-.03-.23-.03-.36 0-1.09.48-2.26 1.32-3.12.42-.44.96-.8 1.6-1.09.64-.28 1.25-.44 1.82-.47.02.2.03.4.03.61zm4.2 16.3c-.32.74-.7 1.43-1.14 2.06-.6.86-1.09 1.45-1.47 1.78-.59.54-1.22.82-1.9.84-.48 0-1.07-.14-1.75-.42-.68-.28-1.31-.42-1.89-.42-.6 0-1.25.14-1.94.42-.7.28-1.26.43-1.69.44-.65.03-1.3-.26-1.95-.86-.41-.36-.93-.97-1.55-1.84-.66-.93-1.21-2.01-1.64-3.24C1.18 15.76 1 14.44 1 13.17c0-1.46.31-2.71.94-3.77.5-.84 1.15-1.51 1.97-2 .82-.49 1.71-.74 2.66-.76.52 0 1.21.16 2.06.48.85.32 1.39.48 1.63.48.18 0 .78-.19 1.81-.56.97-.35 1.79-.5 2.46-.44 1.82.15 3.19.87 4.1 2.16-1.63.99-2.43 2.37-2.42 4.14.02 1.38.51 2.53 1.49 3.44.45.42.95.75 1.5.98-.12.35-.25.68-.38 1.01z"/></svg>';
+const GOOGLE_LOGO = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>';
+function socialButtons() {
+  if (!SB.on) return '';
+  return `<div class="stack gap-12 social">
+    <button type="button" class="btn btn-apple" data-act="social" data-p="apple">${APPLE_LOGO}<span>Continue with Apple</span></button>
+    <button type="button" class="btn btn-google" data-act="social" data-p="google">${GOOGLE_LOGO}<span>Continue with Google</span></button>
+    <p class="form-error t-small social-error" role="alert"></p>
+    <div class="or-row"><span>or use your email</span></div>
+  </div>`;
+}
+async function sha256Hex(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+const socialPlugin = () => window.Capacitor?.Plugins?.SocialLogin || null;
+let socialReady = null;
+function initSocial() {
+  if (!socialReady) {
+    const g = SB.googleIOSClientId ? { iOSClientId: SB.googleIOSClientId, iOSServerClientId: SB.googleWebClientId || undefined } : undefined;
+    socialReady = socialPlugin().initialize({ apple: {}, ...(g ? { google: g } : {}) });
+  }
+  return socialReady;
+}
+function socialErrText(e, name) {
+  const msg = String(e?.message || e || '');
+  if (/cancel/i.test(msg) || e?.code === '1001') return '';
+  if (/provider is not enabled|unsupported provider/i.test(msg)) return `${name} sign-in isn’t switched on yet. Use your email for now.`;
+  if (/client ?id|not configured/i.test(msg)) return `${name} sign-in isn’t set up in this build yet. Use your email for now.`;
+  return sbErrText(e);
+}
+A.social = async (el) => {
+  const provider = el.dataset.p, name = provider === 'apple' ? 'Apple' : 'Google';
+  const err = $('.social-error'); if (err) err.textContent = '';
+  $$('[data-act="social"]').forEach((b) => (b.disabled = true));
+  try {
+    if (isNative() && socialPlugin()) {
+      await initSocial();
+      if (provider === 'apple') {
+        const raw = uid() + uid() + uid();
+        const r = await socialPlugin().login({ provider: 'apple', options: { scopes: ['email', 'name'], nonce: await sha256Hex(raw) } });
+        const token = r?.result?.idToken; if (!token) throw new Error('No Apple ID token returned');
+        const data = sbOk(await SB.client.auth.signInWithIdToken({ provider: 'apple', token, nonce: raw }));
+        // Apple only shares the person's name the first time, so save it.
+        const p = r.result.profile || {}; const full = [p.givenName, p.familyName].filter(Boolean).join(' ');
+        let u = data.user;
+        if (full && !u.user_metadata?.name) u = sbOk(await SB.client.auth.updateUser({ data: { name: full } })).user;
+        await socialFinish(u);
+      } else {
+        if (!SB.googleIOSClientId) throw new Error('Google client ID not configured');
+        const r = await socialPlugin().login({ provider: 'google', options: { scopes: ['email', 'profile'] } });
+        const token = r?.result?.idToken; if (!token) throw new Error('No Google ID token returned');
+        const data = sbOk(await SB.client.auth.signInWithIdToken({ provider: 'google', token }));
+        await socialFinish(data.user);
+      }
+    } else {
+      // Browser: go to Supabase's sign-in page; we come back signed in.
+      // Check first that the provider is switched on, so nobody lands on an error page.
+      const st = await fetch(`${SB.url}/auth/v1/settings`, { headers: { apikey: SB.key } }).then((r) => r.json()).catch(() => null);
+      if (st && !st.external?.[provider]) throw new Error('provider is not enabled');
+      await local.set('kv', 'session', { keep: true });
+      sbOk(await SB.client.auth.signInWithOAuth({ provider, options: { redirectTo: location.origin + location.pathname } }));
+    }
+  } catch (e) {
+    console.error(e);
+    const t = socialErrText(e, name); if (err && t) err.textContent = t;
+  } finally { $$('[data-act="social"]').forEach((b) => (b.disabled = false)); }
+};
+async function socialFinish(authUser) {
+  await sbEnter(authUser, true);
+  if (needsOnboarding() && S.signupAvatar) { S.data.avatar = S.signupAvatar; S.signupAvatar = null; saveData(); }
+  sbRetryPending();
+  S.usesSel = new Set();
+  go(needsOnboarding() ? 'uses' : 'home', {}, { reset: true });
 }
 
 (async function init() {
