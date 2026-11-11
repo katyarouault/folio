@@ -153,8 +153,8 @@ const SB = {
   key: 'sb_publishable_tYQauIOO5i3jBaks3dTj1g_3R68NuoD',
   bucket: 'folio-images',
   // Google Cloud Console -> Credentials -> OAuth client IDs (fill in once created).
-  googleIOSClientId: '',
-  googleWebClientId: '',
+  googleIOSClientId: '688642040444-e7edipsjeeleugaioq8s74e3paqjjjjn.apps.googleusercontent.com',
+  googleWebClientId: '688642040444-9bdbpf377f0fitsj9ll2n71d2862ndot.apps.googleusercontent.com',
   on: false, client: null, uid: null,
 };
 const isNative = () => !!window.Capacitor?.isNativePlatform?.();
