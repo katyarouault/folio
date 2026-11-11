@@ -5,5 +5,15 @@
   "ios": {
     "contentInset": "never",
     "backgroundColor": "#fafcf2"
+  },
+  "plugins": {
+    "SocialLogin": {
+      "providers": {
+        "google": true,
+        "apple": true,
+        "facebook": false,
+        "twitter": false
+      }
+    }
   }
 }

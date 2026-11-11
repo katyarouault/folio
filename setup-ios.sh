@@ -13,7 +13,7 @@ echo "2/4  Installing Capacitor"
 npm install --no-audit --no-fund
 
 echo "3/4  Creating / updating the Xcode project"
-[ -d ios ] || npx cap add ios --packagemanager SPM
+[ -d ios ] || npx cap add ios
 npx cap sync ios
 
 PL=ios/App/App/Info.plist
@@ -37,4 +37,4 @@ else
 fi
 
 echo "4/4  Opening Xcode"
-npx cap open ios
+[ -n "$NO_OPEN" ] || npx cap open ios

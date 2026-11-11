@@ -158,6 +158,7 @@ const SB = {
   on: false, client: null, uid: null,
 };
 const isNative = () => !!window.Capacitor?.isNativePlatform?.();
+if (isNative()) document.documentElement.classList.add('native');
 try {
   if (window.supabase?.createClient && !window.claude?.use) {
     SB.client = window.supabase.createClient(SB.url, SB.key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: !isNative() } });

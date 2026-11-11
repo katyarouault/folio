@@ -605,3 +605,8 @@ input[type="date"].input::-webkit-calendar-picker-indicator { opacity: .6; curso
 .or-row { display: flex; align-items: center; gap: 12px; color: var(--ink-2, currentColor); opacity: .75; font-size: .9375rem; margin-top: 4px; }
 .or-row::before, .or-row::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 .social-error:empty { display: none; }
+
+/* Inside the iPhone app: keep clear of the status bar and home indicator */
+.native #app { top: env(safe-area-inset-top, 0px); }
+.native .footer { height: calc(66px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.native .sheet { padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
