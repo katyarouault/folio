@@ -2197,6 +2197,26 @@ if (SB.on) {
   };
   A['delete-account'] = async () => {
     if (!(await confirmSheet({ title: 'Delete your account?', body: 'Your account and all of your notes, folders and pages will be permanently removed from Folio. This can’t be undone.', ok: 'Delete forever', danger: true }))) return;
+    // Signed in with Apple? Apple requires us to revoke Folio's access too:
+    // ask Apple for a fresh one-time code and let the revoke-apple function use it.
+    const authUser = (await SB.client.auth.getUser().catch(() => null))?.data?.user;
+    const usedApple = (authUser?.identities || []).some((i) => i.provider === 'apple') || authUser?.app_metadata?.provider === 'apple';
+    if (usedApple && isNative() && socialPlugin()) {
+      let code = '';
+      try {
+        await initSocial();
+        const r = await socialPlugin().login({ provider: 'apple', options: { scopes: [] } });
+        code = r?.result?.authorizationCode || r?.result?.accessToken?.token || '';
+      } catch (e) {
+        if (/cancel/i.test(String(e?.message || e)) || e?.code === '1001') { toast('Account not deleted'); return; }
+        console.warn('Apple re-confirm failed', e);
+      }
+      busy(true, 'Deleting…');
+      if (code) {
+        const { error } = await SB.client.functions.invoke('revoke-apple', { body: { code } }).catch((e) => ({ error: e }));
+        if (error) console.warn('Apple revoke failed', error); // still delete the account
+      }
+    }
     busy(true, 'Deleting…');
     try {
       // Remove this person's images, then their login (their notes row goes with it).
