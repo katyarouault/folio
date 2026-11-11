@@ -1,6 +1,6 @@
 # Folio
 
-**Turn your handwritten world into a digital home.**
+**Turn your handwritten world into a digital home.** · [Website](https://katyarouault.github.io/folio/) · [Privacy](https://katyarouault.github.io/folio/privacy.html) · [Support](https://katyarouault.github.io/folio/support.html)
 
 Folio is an iPhone app for people who still think on paper. Snap a page of class notes, a recipe card or a sketch, and Folio cleans it up, files it into folders and tags, and makes it searchable. You can also draw and make to-do lists inside the app.
 

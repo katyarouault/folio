@@ -1381,7 +1381,8 @@ screens.help = () => {
   return `<div class="screen">${topbar({ title: 'Help &amp; Support' })}<div class="scroll pad-x">
     ${faq.map(([q, a]) => `<details class="faq"><summary>${esc(q)}${icon('down')}</summary><p>${esc(a)}</p></details>`).join('')}
     <div class="card mt-24"><h3 class="t-h3">Still stuck?</h3><p class="t-small muted" style="margin-bottom:12px">Email us with questions, bugs or ideas and we’ll get back to you.</p>
-      <div class="contact-row"><span class="contact-email" id="help-email">${SUPPORT_EMAIL}</span><button class="btn btn-soft btn-sm" data-act="copy-help-email">${icon('copy')} Copy</button></div></div>
+      <div class="contact-row"><span class="contact-email" id="help-email">${SUPPORT_EMAIL}</span><button class="btn btn-soft btn-sm" data-act="copy-help-email">${icon('copy')} Copy</button></div>
+      ${SB.on ? `<p class="t-small" style="margin-top:12px"><a class="link" href="${SITE_URL}support.html" target="_blank" rel="noopener">Support website</a> · <a class="link" href="${SITE_URL}privacy.html" target="_blank" rel="noopener">Privacy Policy</a></p>` : ''}</div>
   </div></div>`;
 };
 
@@ -1422,8 +1423,10 @@ A['copy-help-email'] = async () => {
 };
 A.terms = () => openSheet(`<h2 class="t-h3 sheet-title">Terms &amp; Privacy</h2>
   <p class="t-body" style="margin-bottom:12px">${SB.on ? 'Folio keeps your account and notes in your private Folio account, so they follow you to other devices. Only you can see them. A copy is also kept on this phone so Folio works offline.' : cloud.db ? 'Folio keeps your account and notes in your private claude.ai storage, so they follow you across devices. Nobody else who opens this page can see them.' : 'Folio keeps your account and notes on this device, inside this browser. Nothing is uploaded to a server.'}</p>
-  <p class="t-body muted" style="margin-bottom:20px">Download a backup from Profile → Backup &amp; Sync from time to time to keep a copy of your own.</p>
+  <p class="t-body muted" style="margin-bottom:${SB.on ? 12 : 20}px">Download a backup from Profile → Backup &amp; Sync from time to time to keep a copy of your own.</p>
+  ${SB.on ? `<p class="t-body" style="margin-bottom:20px">Read the full <a class="link" href="${SITE_URL}privacy.html" target="_blank" rel="noopener">Privacy Policy</a> or get <a class="link" href="${SITE_URL}support.html" target="_blank" rel="noopener">Support</a>.</p>` : ''}
   <button class="btn btn-primary" data-act="close-sheet">Got it</button>`);
+const SITE_URL = 'https://katyarouault.github.io/folio/';
 
 /* auth */
 function setErr(form, name, msg) { const e = $(`[data-err="${name}"]`, form); if (e) e.textContent = msg; $(`[name="${name}"]`, form)?.classList.add('has-err'); }
