@@ -1517,7 +1517,10 @@ A['get-started'] = () => go('home', {}, { reset: true });
 A.logout = async () => {
   if (!(await confirmSheet({ title: 'Log out of Folio?', body: SB.on ? 'Your notes stay saved in your account. Log back in any time to see them.' : 'Your notes stay saved on this device.', ok: 'Log out' }))) return;
   await flushData(); S.session = null; S.data = null; await store.del('kv', 'session');
-  if (SB.on) { await SB.client.auth.signOut().catch(() => {}); SB.uid = null; }
+  if (SB.on) {
+    await SB.client.auth.signOut().catch(() => {}); SB.uid = null;
+    if (isNative() && socialPlugin()) { try { await initSocial(); await socialPlugin().logout({ provider: 'google' }); } catch { /* not signed in with Google */ } }
+  }
   applyTheme(); go('welcome', {}, { reset: true });
 };
 
@@ -2268,6 +2271,8 @@ A.social = async (el) => {
         await socialFinish(u);
       } else {
         if (!SB.googleIOSClientId) throw new Error('Google client ID not configured');
+        // Forget the last Google account so the account picker always shows.
+        await socialPlugin().logout({ provider: 'google' }).catch(() => {});
         const r = await socialPlugin().login({ provider: 'google', options: { scopes: ['email', 'profile'] } });
         const token = r?.result?.idToken; if (!token) throw new Error('No Google ID token returned');
         const data = sbOk(await SB.client.auth.signInWithIdToken({ provider: 'google', token }));
