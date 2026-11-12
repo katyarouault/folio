@@ -21,6 +21,8 @@ setkey() { /usr/libexec/PlistBuddy -c "Set :$1 $2" "$PL" 2>/dev/null || /usr/lib
 setkey NSCameraUsageDescription "Folio uses your camera to scan handwritten pages and notes."
 setkey NSPhotoLibraryUsageDescription "Folio lets you pick photos of your notes to add to your library."
 setkey NSPhotoLibraryAddUsageDescription "Folio saves pages you export to your photo library."
+# Folio only uses standard HTTPS, so it is exempt from export-compliance paperwork.
+/usr/libexec/PlistBuddy -c "Set :ITSAppUsesNonExemptEncryption false" "$PL" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" "$PL"
 
 # Google Sign-In needs the reversed iOS client ID as a URL scheme.
 GID=$(sed -n "s/.*googleIOSClientId: '\([^']*\)'.*/\1/p" app.js | head -1)
