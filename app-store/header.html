@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Folio App Store header</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<style>
+  /* Rendered at 3840 x 1646 for the App Store product page header. */
+  html, body { margin: 0; }
+  body {
+    width: 3840px; height: 1646px; overflow: hidden; position: relative;
+    background: #fafcf2;
+    font-family: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+    color: #1f281e;
+  }
+  .wash { position: absolute; border-radius: 50%; filter: blur(2px); }
+  .wash.a { width: 1900px; height: 1900px; right: -420px; top: -620px; background: #e3ecdf; }
+  .wash.b { width: 1100px; height: 1100px; right: 1150px; bottom: -760px; background: #efe9da; }
+  .text { position: absolute; left: 260px; top: 50%; transform: translateY(-50%); width: 1500px; }
+  .brand { display: flex; align-items: center; gap: 56px; }
+  .brand img { width: 260px; height: 260px; border-radius: 58px; box-shadow: 0 18px 50px rgba(40, 55, 38, .18); }
+  .brand h1 { font-size: 250px; font-weight: 600; margin: 0; letter-spacing: 2px; line-height: 1; }
+  .tagline { font-size: 132px; font-weight: 500; line-height: 1.08; margin: 90px 0 0; text-wrap: balance; }
+  .tagline em { color: #4b5e49; }
+  .uses { display: flex; gap: 28px; margin-top: 90px; flex-wrap: wrap; }
+  .uses span {
+    font-size: 58px; font-weight: 600; padding: 18px 46px; border-radius: 999px;
+    background: #ffffff; border: 3px solid #d9d4c4; color: #4b5e49;
+  }
+  .phones { position: absolute; right: 230px; top: 50%; transform: translateY(-50%); width: 1700px; height: 1500px; }
+  .phone {
+    position: absolute; width: 560px; height: 1217px; border-radius: 86px;
+    background: #1c2219; padding: 22px; box-sizing: border-box;
+    box-shadow: 0 40px 90px rgba(30, 40, 28, .28);
+  }
+  .phone img { width: 100%; height: 100%; border-radius: 66px; display: block; object-fit: cover; }
+  .p1 { left: 0; top: 190px; transform: rotate(-7deg); }
+  .p2 { left: 570px; top: 40px; z-index: 2; }
+  .p3 { left: 1140px; top: 190px; transform: rotate(7deg); }
+</style>
+</head>
+<body>
+  <div class="wash a"></div>
+  <div class="wash b"></div>
+
+  <div class="text">
+    <div class="brand">
+      <img src="../assets/app-icon-1024.png" alt="">
+      <h1>Folio</h1>
+    </div>
+    <p class="tagline">Everything you make on paper, <em>in one place.</em></p>
+    <div class="uses"><span>Class notes</span><span>Artwork</span><span>Worksheets</span><span>Recipes</span></div>
+  </div>
+
+  <div class="phones">
+    <div class="phone p1"><img src="screenshots-6.9in/2-scanned-note.png" alt=""></div>
+    <div class="phone p2"><img src="screenshots-6.9in/1-home.png" alt=""></div>
+    <div class="phone p3"><img src="screenshots-6.9in/5-drawing.png" alt=""></div>
+  </div>
+</body>
+</html>
